@@ -7,6 +7,19 @@
 
 ** Added
 
+- assertions (re-exported from https://deno.land/std@0.97.0/testing/asserts.ts)
+  - =assert=
+  - =assertEquals=
+  - =assertExists=
+  - =assertNotEquals=
+  - =assertStrictEquals=
+  - =assertStringIncludes=
+  - =assertArrayIncludes=
+  - =assertMatch=
+  - =assertNotMatch=
+  - =assertObjectMatch=
+  - =assertThrows=
+  - =assertThrowsAsync=
 - basic support for grouping tests (via =testGroup=)
 - files
   - =mod.ts=
