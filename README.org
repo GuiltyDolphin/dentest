@@ -2,6 +2,30 @@
 
 Testing framework for Deno.
 
+* Usage
+
+Dentest provides support for grouping tests using
+=testGroup=. Only top-level tests need to be run using the
+=runAsMain= method. The following example shows how to group
+tests in this manner:
+
+#+BEGIN_SRC typescript
+  import {
+      assertEquals,
+      testGroup,
+      Test
+  } from 'https://deno.land/x/dentest/mod.ts'
+
+  testGroup('booleans',
+      new Test('true is true', () => assertEquals(true, true)),
+      new Test('false is false', () => assertEquals(false, false)),
+      testGroup('more boolean tests',
+          new Test('not true is false', () => assertEquals(!true, false)),
+          new Test('not false is true', () => assertEquals(!false, true)),
+      ),
+  ).runAsMain();
+#+END_SRC
+
 * Development
 
 ** Coverage

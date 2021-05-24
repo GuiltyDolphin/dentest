@@ -24,6 +24,8 @@
 - files
   - =mod.ts=
   - =src/dentest.ts=
+- =Usage= section in README
+  - basic example of usage
 
 * 0.0.0 - 2021-05-24
 
