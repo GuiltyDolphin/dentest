@@ -5,6 +5,13 @@
 
 * Unreleased
 
+** Added
+
+- basic support for grouping tests (via =testGroup=)
+- files
+  - =mod.ts=
+  - =src/dentest.ts=
+
 * 0.0.0 - 2021-05-24
 
 ** Added
