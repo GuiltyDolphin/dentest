@@ -5,6 +5,12 @@
 
 * Unreleased
 
+** Changed
+
+- assertions no longer accept arguments of any type, instead
+  requiring that e.g., in equality assertions, that the
+  arguments are of compatible types
+
 * 0.1.0 - 2021-05-24
 
 ** Added
