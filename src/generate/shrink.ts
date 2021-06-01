@@ -54,6 +54,11 @@ function unique<T>(xs: T[]): T[] {
     return res;
 }
 
+/** Return a new array with the element at the given index replaced with the given element. */
+function replace<T>(xs: T[], i: number, elt: T): T[] {
+    return xs.slice(0, i - xs.length).concat(elt, xs.slice(i + 1));
+}
+
 /**
  *
  * Shrink a list. `shr` is used to shrink each element.
@@ -86,12 +91,9 @@ export function shrinkList<T>(shr: (x: T) => T[], xs: T[]) {
         }
         return [xs2, ...removes(k, (n - k), xs2).map(ys => xs1.concat(ys))];
     };
-    const shrinkOne = (ls: T[]): T[][] => {
-        if (ls.length === 0) {
-            return [];
-        }
-        const [y, ...ys] = ls;
-        return shr(y).map(y2 => [y2].concat(ys)).concat(shrinkOne(ys).map(ys2 => [y].concat(ys2)));
+    const shrunkOne: T[][] = [];
+    for (let i = 0; i < xs.length; i++) {
+        shr(xs[i]).forEach(e => shrunkOne.push(replace(xs, i, e)));
     }
-    return unique(twoDivisors(n).map(e => removes(e, n, xs)).flat().concat(shrinkOne(xs)));
+    return unique(twoDivisors(n).map(e => removes(e, n, xs)).flat().concat(shrunkOne));
 }
