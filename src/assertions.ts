@@ -1,6 +1,8 @@
 import * as da from 'https://deno.land/std@0.97.0/testing/asserts.ts';
 
-export interface Assertion { }
+export import AssertionError = da.AssertionError;
+
+type Assertion = void;
 
 /** Assert that the expression is true. */
 export function assert(expr: boolean, msg = ""): Assertion {

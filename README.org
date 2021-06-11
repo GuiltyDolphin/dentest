@@ -26,6 +26,38 @@ tests in this manner:
   ).runAsMain();
 #+END_SRC
 
+** Decorators
+
+Various decorators are provided that allow you to use classes
+to group tests. Classes decorated with test decorators can be
+run using =runTests= from =src/decorators.ts=.
+
+- =@after=
+
+  Marks the method to be run after each test. If multiple
+  methods have =@after= specified, then they are run in the
+  order they are defined.
+
+- =@before=
+
+  Marks the method to be run before each test. If multiple
+  methods have =@before= specified, then they are run in the
+  order they are defined.
+
+- =@skip=
+
+  Marks the test for skipping (the test will not be run).
+
+- =@subtest=
+
+  Marks a method as a generator for subtests. The method
+  should return a class with subtests contained within it.
+
+- =@test=
+
+  Marks the given method as a test method, which will be run
+  as part of the test suite.
+
 * Development
 
 ** Coverage

@@ -7,6 +7,21 @@
 
 ** Added
 
+- decorators
+  - =src/decorators.ts=
+    - =@after=
+    - =@before=
+    - =@skip=
+    - =@subtest=
+    - =@test=
+- dependencies
+  - [[https://deno.land/x/functionality@v0.2.3]]
+- files
+  - =src/decorators.ts=
+  - =tests/decorators_test.ts=
+- functions
+  - =src/decorators.ts=
+    - =runTests=
 - interfaces
   - =src/assertions.ts=
     - =Assertion=
