@@ -66,8 +66,17 @@ function metaGetterBoolean(metaKey: KeysOfType<Meta, boolean>): (x: object) => b
 export const after = metaEnabler('isAfter');
 export const before = metaEnabler('isBefore');
 export const skip = metaEnabler('skip');
-export const subtest = metaEnabler('isSubtest');
 export const test = metaEnabler('isTest');
+
+/**
+ * Decorator that marks a method as a generator for subtests.
+ *
+ * The method must return a class whose constructor accepts zero
+ * arguments.
+ */
+export function subtest<K extends string>(target: { [k in K]: () => Constructor<{}, []> }, property: K): void {
+    return metaEnabler('isSubtest')(target, property);
+}
 
 const shouldSkip = metaGetterBoolean('skip');
 const isTest = metaGetterBoolean('isTest');
