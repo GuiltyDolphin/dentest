@@ -1,4 +1,4 @@
-import * as da from 'https://deno.land/std@0.97.0/testing/asserts.ts';
+import { da } from './deps.ts';
 
 export import AssertionError = da.AssertionError;
 

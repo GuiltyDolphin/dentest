@@ -36,6 +36,8 @@
   requiring that e.g., in equality assertions, that the
   arguments are of compatible types
 - assertions now have an =Assertion= type, rather than =void=
+- dependencies
+  - updated to [[https://deno.land/std@0.99.0/testing/asserts.ts]]
 
 * 0.1.0 - 2021-05-24
 
