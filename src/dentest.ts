@@ -87,32 +87,56 @@ export class Test implements Testable {
     }
 }
 
-export class TestGroup implements Testable {
-    private namePart: string;
+interface TestGroupOptions {
+    /* Function run after before each in the group. */
+    beforeEach?: () => void;
 
+    /* Function run after each test in the group. */
+    afterEach?: () => void;
+
+    /* Name of the group. */
+    name: string;
+}
+
+export class TestGroup implements Testable {
+    private options: TestGroupOptions;
     private tests: Testable[];
 
-    constructor(namePart: string, ...tests: Testable[]) {
-        this.namePart = namePart;
+    constructor(options: TestGroupOptions, ...tests: Testable[]) {
+        this.options = options;
         this.tests = tests;
     }
 
     runAsInner(topDesc: string) {
-        this.tests.map(t => t.runAsInner(`${topDesc}, ${this.namePart}`));
+        this.tests.map(t => t.runAsInner(`${topDesc}, ${this.options.name}`));
     }
 
     runAsMain() {
-        this.tests.map(t => t.runAsInner(`${this.namePart}`));
+        this.tests.map(t => t.runAsInner(`${this.options.name}`));
     }
 
     runTest(): [GroupResultInfo, TestResultTree[]] {
         const testInfo: GroupResultInfo = {
-            name: this.namePart
+            name: this.options.name
         };
-        return groupResult(testInfo, this.tests.map(t => t.runTest()));
+        return groupResult(testInfo, this.tests.map(t => {
+            if (this.options.beforeEach) {
+                this.options.beforeEach();
+            }
+            const res = t.runTest();
+            if (this.options.afterEach) {
+                this.options.afterEach();
+            }
+            return res;
+        }));
     }
 }
 
-export function testGroup(topDesc: string, ...tests: Testable[]): TestGroup {
-    return new TestGroup(topDesc, ...tests);
+export function testGroup(options: TestGroupOptions, ...tests: Testable[]): TestGroup
+export function testGroup(topDesc: string, ...tests: Testable[]): TestGroup
+export function testGroup(arg1: TestGroupOptions | string, ...tests: Testable[]) {
+    if (typeof arg1 === 'string') {
+        return new TestGroup({ name: arg1 }, ...tests);
+    }
+    return new TestGroup(arg1, ...tests);
 }

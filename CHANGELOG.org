@@ -29,6 +29,11 @@
 - interfaces
   - =src/assertions.ts=
     - =Assertion=
+- =testGroup= now takes an optional argument that specifies
+  options for the test group. Supported options are:
+  - =afterEach=
+  - =beforeEach=
+  - =name=
 
 ** Changed
 

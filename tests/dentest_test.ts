@@ -68,3 +68,49 @@ Deno.test('correct failure, group (complex, partial failure)',
         { result: 'pass', testInfo: { name: '2 == 2' } }]]]])
     }
 );
+
+Deno.test('testGroup, afterEach',
+    () => {
+        let counter = 0;
+        const res = testGroup({
+            name: 'test group',
+            afterEach: () => {
+                counter++;
+            }
+        }, new Test('test1', () => {
+            dt.assertEquals(counter, 0);
+        }), new Test('test2', () => {
+            dt.assertEquals(1, 2);
+        }), new Test('test3', () => {
+            dt.assertEquals(counter, 2);
+        }),
+        ).runTest();
+        da.assertEquals(res, [{ name: 'test group' },
+        [{ result: 'pass', testInfo: { name: 'test1' } },
+        { result: 'fail', testInfo: { name: 'test2' }, reason: new AssertionError('') },
+        { result: 'pass', testInfo: { name: 'test3' } }]]);
+    }
+);
+
+Deno.test('testGroup, beforeEach',
+    () => {
+        let counter = 0;
+        const res = testGroup({
+            name: 'test group',
+            beforeEach: () => {
+                counter++;
+            }
+        }, new Test('test1', () => {
+            dt.assertEquals(counter, 1);
+        }), new Test('test2', () => {
+            dt.assertEquals(1, 2);
+        }), new Test('test3', () => {
+            dt.assertEquals(counter, 3);
+        }),
+        ).runTest();
+        da.assertEquals(res, [{ name: 'test group' },
+        [{ result: 'pass', testInfo: { name: 'test1' } },
+        { result: 'fail', testInfo: { name: 'test2' }, reason: new AssertionError('') },
+        { result: 'pass', testInfo: { name: 'test3' } }]]);
+    }
+);
