@@ -114,3 +114,46 @@ Deno.test('testGroup, beforeEach',
         { result: 'pass', testInfo: { name: 'test3' } }]]);
     }
 );
+
+type CaseInfo = {
+    passed: number;
+    filtered?: number;
+    failed?: number;
+};
+
+async function testCaseHelper(caseName: string, resInfo: CaseInfo, opts?: { extraArgs: string }) {
+    const testProc = await Deno.run({
+        cmd: ['deno', 'test', `tests/cases/${caseName}.ts`].concat(opts?.extraArgs ?? []),
+        stderr: 'null',
+        stdout: 'piped',
+    });
+    const numPassed = resInfo.passed;
+    const numFailed = resInfo.failed ?? 0;
+    const numFiltered = 'filtered' in resInfo ? resInfo.filtered : 0;
+    const totalTests = numPassed + numFailed;
+    try {
+        const output = new TextDecoder().decode(await testProc.output());
+        da.assertMatch(output, new RegExp(`^running ${totalTests} test${totalTests === 1 ? '' : 's'} from file:.*tests\\/cases\\/${caseName}\\.ts`));
+        da.assertMatch(output, new RegExp(`test result: ${numFailed === 0 ? 'ok' : 'FAILED'}\\. ${numPassed} passed; ${numFailed} failed; 0 ignored; 0 measured; ${numFiltered} filtered out \\([0-9]+ms\\)$`, 'm'));
+    } catch (e) {
+        throw e;
+    } finally {
+        testProc.close();
+    }
+}
+
+Deno.test('correct recorded number of tests, Test.runAsMain runs with `deno test`', async () => {
+    await testCaseHelper('001-Test-runAsMain', { passed: 1 });
+});
+
+Deno.test('correct recorded number of tests, TestGroup.runAsMain runs with `deno test`', async () => {
+    await testCaseHelper('002-TestGroup-runAsMain', { passed: 3 });
+});
+
+Deno.test('correct recorded number of tests, mixed failing and succeeding tests', async () => {
+    await testCaseHelper('003-mixed', { passed: 4, failed: 4 });
+});
+
+Deno.test('correct recorded number of tests, mixed failing and succeeding tests, filtered', async () => {
+    await testCaseHelper('003-mixed', { passed: 2, failed: 2, filtered: 4 }, { extraArgs: '--filter=group' });
+});
