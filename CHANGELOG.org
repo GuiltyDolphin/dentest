@@ -19,9 +19,13 @@
 - files
   - =src/decorators.ts=
   - =tests/decorators_test.ts=
+  - =tests/dentest_test.ts=
+  - =tests/deps.ts=
 - functions
   - =src/decorators.ts=
     - =runTests=
+  - =src/dentest.ts=
+    - =Testable.runTest=
 - interfaces
   - =src/assertions.ts=
     - =Assertion=
