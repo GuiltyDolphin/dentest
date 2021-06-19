@@ -69,6 +69,23 @@ Deno.test('correct failure, group (complex, partial failure)',
     }
 );
 
+for (const [tn, skip, resType] of
+    [['boolean = false', false, 'pass'],
+    ['boolean = true', true, 'skip'],
+    ['booleanFn -> false', () => false, 'pass'],
+    ['booleanFn -> true', () => true, 'skip']] as [string, boolean | (() => boolean), 'pass' | 'skip'][]) {
+    Deno.test(`Test, skip, ${tn}`,
+        () => {
+            const res = new Test({
+                name: 'test',
+                skip: skip
+            }, () => dt.assertEquals(1, 1)).runTest();
+            da.assertEquals(res, { result: resType, testInfo: { name: 'test' } });
+        }
+    );
+
+}
+
 Deno.test('testGroup, afterEach',
     () => {
         let counter = 0;
@@ -119,6 +136,7 @@ type CaseInfo = {
     passed: number;
     filtered?: number;
     failed?: number;
+    ignored?: number;
 };
 
 async function testCaseHelper(caseName: string, resInfo: CaseInfo, opts?: { extraArgs: string }) {
@@ -130,11 +148,12 @@ async function testCaseHelper(caseName: string, resInfo: CaseInfo, opts?: { extr
     const numPassed = resInfo.passed;
     const numFailed = resInfo.failed ?? 0;
     const numFiltered = 'filtered' in resInfo ? resInfo.filtered : 0;
-    const totalTests = numPassed + numFailed;
+    const numIgnored = resInfo.ignored ?? 0;
+    const totalTests = numPassed + numFailed + numIgnored;
     try {
         const output = new TextDecoder().decode(await testProc.output());
         da.assertMatch(output, new RegExp(`^running ${totalTests} test${totalTests === 1 ? '' : 's'} from file:.*tests\\/cases\\/${caseName}\\.ts`));
-        da.assertMatch(output, new RegExp(`test result: ${numFailed === 0 ? 'ok' : 'FAILED'}\\. ${numPassed} passed; ${numFailed} failed; 0 ignored; 0 measured; ${numFiltered} filtered out \\([0-9]+ms\\)$`, 'm'));
+        da.assertMatch(output, new RegExp(`test result: ${numFailed === 0 ? 'ok' : 'FAILED'}\\. ${numPassed} passed; ${numFailed} failed; ${numIgnored} ignored; 0 measured; ${numFiltered} filtered out \\([0-9]+ms\\)$`, 'm'));
     } catch (e) {
         throw e;
     } finally {
@@ -156,4 +175,8 @@ Deno.test('correct recorded number of tests, mixed failing and succeeding tests'
 
 Deno.test('correct recorded number of tests, mixed failing and succeeding tests, filtered', async () => {
     await testCaseHelper('003-mixed', { passed: 2, failed: 2, filtered: 4 }, { extraArgs: '--filter=group' });
+});
+
+Deno.test('correct recorded number of tests, tests with skip', async () => {
+    await testCaseHelper('004-Test-skip', { passed: 3, ignored: 3 });
 });

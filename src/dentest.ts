@@ -17,6 +17,8 @@ type TestResult = {
 } | {
     result: 'fail'
     reason: AssertionError
+} | {
+    result: 'skip'
 });
 
 type GroupResultInfo = {
@@ -49,31 +51,57 @@ function testOk(info: TestInfo): TestResult {
     };
 }
 
+function skipTest(info: TestInfo): TestResult {
+    return {
+        result: 'skip',
+        testInfo: info
+    };
+}
+
 function groupResult(groupInfo: GroupResultInfo, results: TestResultTree[]): [GroupResultInfo, TestResultTree[]] {
     return [groupInfo, results];
+}
+
+type TestOptions = {
+    name: string;
+    skip: boolean | (() => boolean);
 }
 
 export class Test implements Testable {
     description: string;
     runner: () => void;
+    skip: boolean | (() => boolean);
 
-    constructor(description: string, runner: () => void) {
-        this.description = description;
+    constructor(opts: string | TestOptions, runner: () => void) {
+        if (typeof opts === 'string') {
+            this.description = opts;
+            this.skip = false;
+        } else {
+            this.description = opts.name;
+            this.skip = opts.skip;
+        }
         this.runner = runner;
     }
 
     runAsInner(topDesc: string) {
-        Deno.test(`${topDesc}, ${this.description}`, this.runner);
+        Deno.test({ name: `${topDesc}, ${this.description}`, ignore: this.shouldSkip(), fn: this.runner });
     }
 
     runAsMain() {
-        Deno.test(`${this.description}`, this.runner);
+        Deno.test({ name: `${this.description}`, ignore: this.shouldSkip(), fn: this.runner });
+    }
+
+    private shouldSkip(): boolean {
+        return typeof this.skip === 'boolean' ? this.skip : this.skip();
     }
 
     runTest() {
         const testInfo = {
             name: this.description
         };
+        if (this.shouldSkip()) {
+            return skipTest(testInfo);
+        }
         try {
             this.runner();
             return testOk(testInfo);

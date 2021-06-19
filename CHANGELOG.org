@@ -29,6 +29,8 @@
 - interfaces
   - =src/assertions.ts=
     - =Assertion=
+- =Test= can now take a =skip= option (a boolean or nullary
+  boolean function)
 - =testGroup= now takes an optional argument that specifies
   options for the test group. Supported options are:
   - =afterEach=
