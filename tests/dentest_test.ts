@@ -140,9 +140,10 @@ type CaseInfo = {
 };
 
 async function testCaseHelper(caseName: string, resInfo: CaseInfo, opts?: { extraArgs: string }) {
-    const testProc = await Deno.run({
-        cmd: ['deno', 'test', `tests/cases/${caseName}.ts`].concat(opts?.extraArgs ?? []),
-        stderr: 'null',
+    const casePath = `tests/cases/${caseName}.ts`;
+    const testProc = Deno.run({
+        cmd: ['deno', 'test', casePath].concat(opts?.extraArgs ?? []),
+        stderr: 'piped',
         stdout: 'piped',
     });
     const numPassed = resInfo.passed;
@@ -151,6 +152,10 @@ async function testCaseHelper(caseName: string, resInfo: CaseInfo, opts?: { extr
     const numIgnored = resInfo.ignored ?? 0;
     const totalTests = numPassed + numFailed + numIgnored;
     try {
+        const errOut = new TextDecoder().decode(await testProc.stderrOutput());
+        if (errOut.match(/^error: Cannot resolve module/)) {
+            throw new AssertionError(`module: ${casePath} does not exist`);
+        }
         const output = new TextDecoder().decode(await testProc.output());
         da.assertMatch(output, new RegExp(`^running ${totalTests} test${totalTests === 1 ? '' : 's'} from file:.*tests\\/cases\\/${caseName}\\.ts`));
         da.assertMatch(output, new RegExp(`test result: ${numFailed === 0 ? 'ok' : 'FAILED'}\\. ${numPassed} passed; ${numFailed} failed; ${numIgnored} ignored; 0 measured; ${numFiltered} filtered out \\([0-9]+ms\\)$`, 'm'));
