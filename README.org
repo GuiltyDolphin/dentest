@@ -1,8 +1,17 @@
 #+TITLE: Dentest
 
+#+BEGIN_EXPORT html
+<a href="https://doc.deno.land/https/deno.land/x/dentest/mod.ts"><img src="https://doc.deno.land/badge.svg" alt="deno doc"></a>
+#+END_EXPORT
+
 Testing framework for Deno.
 
-* Usage
+* Documentation
+
+The main entry point is [[./mod.ts][mod.ts]]. The full API documentation is
+available at [[https://doc.deno.land/https/deno.land/x/dentest/mod.ts][doc.deno.land]].
+
+** Usage
 
 Dentest provides support for grouping tests using
 =testGroup=. Only top-level tests need to be run using the
