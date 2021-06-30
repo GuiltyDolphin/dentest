@@ -13,6 +13,11 @@ available at [[https://doc.deno.land/https/deno.land/x/dentest/mod.ts][doc.deno.
 
 ** Usage
 
+Dentest serves as a drop-in replacement for Deno tests, which
+means you can use =deno test= to run tests as usual.
+
+** Grouping tests
+
 Dentest provides support for grouping tests using
 =testGroup=. Only top-level tests need to be run using the
 =runAsMain= method. The following example shows how to group
