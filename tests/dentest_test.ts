@@ -137,6 +137,7 @@ type CaseInfo = {
     filtered?: number;
     failed?: number;
     ignored?: number;
+    total?: number;
 };
 
 async function testCaseHelper(caseName: string, resInfo: CaseInfo, opts?: { extraArgs: string }) {
@@ -150,7 +151,7 @@ async function testCaseHelper(caseName: string, resInfo: CaseInfo, opts?: { extr
     const numFailed = resInfo.failed ?? 0;
     const numFiltered = 'filtered' in resInfo ? resInfo.filtered : 0;
     const numIgnored = resInfo.ignored ?? 0;
-    const totalTests = numPassed + numFailed + numIgnored;
+    const totalTests = resInfo.total ?? numPassed + numFailed + numIgnored;
     try {
         const errOut = new TextDecoder().decode(await testProc.stderrOutput());
         if (errOut.match(/^error: Cannot resolve module/)) {
@@ -184,4 +185,8 @@ Deno.test('correct recorded number of tests, mixed failing and succeeding tests,
 
 Deno.test('correct recorded number of tests, tests with skip', async () => {
     await testCaseHelper('004-Test-skip', { passed: 3, ignored: 3 });
+});
+
+Deno.test('correct recorded number of tests, with --fail-fast', async () => {
+    await testCaseHelper('003-mixed', { passed: 1, failed: 1, total: 8 }, { extraArgs: '--fail-fast' });
 });
